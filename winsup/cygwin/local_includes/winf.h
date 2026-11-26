@@ -99,3 +99,5 @@ class linebuf
     return wbuf;
   }
 };
+
+void build_argv (char *cmd, char **&argv, int &argc, int winshell);
