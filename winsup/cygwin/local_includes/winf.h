@@ -78,7 +78,7 @@ class linebuf
   void add (const char *what) {add (what, strlen (what));}
   void prepend (const char *, int);
   void finish (bool);
-  bool fromargv(av&, const char *, bool);;
+  bool fromargv(av&, const char *, bool, bool fq = false);;
   operator size_t () const { return ix + 1; }
   operator const char * () const { return buf; }
   operator wchar_t * ()
@@ -100,4 +100,4 @@ class linebuf
   }
 };
 
-void build_argv (char *cmd, char **&argv, int &argc, int winshell);
+extern "C" int cygwin_cmdline_parse (char *cmd, char ***pargv, char **allocs, int doglob, int maxfile);

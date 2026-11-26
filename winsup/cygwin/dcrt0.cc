@@ -37,6 +37,8 @@ details. */
 #include "ntdll.h"
 #include "winf.h"
 
+#define MAX_AT_FILE_LEVEL 10
+
 #define PREMAIN_LEN (sizeof (user_data->premain) / sizeof (user_data->premain[0]))
 
 extern "C" void cygwin_exit (int) __attribute__ ((noreturn));
@@ -622,8 +624,13 @@ dll_crt0_1 (void *)
 
       /* Scan the command line and build argv.  Expand wildcards if not
 	 called from another cygwin process. */
-      build_argv (line, __argv, __argc,
-		  NOTSTATE (myself, PID_CYGPARENT) && allow_glob);
+      __argc = cygwin_cmdline_parse (line, &__argv, NULL,
+		NOTSTATE (myself, PID_CYGPARENT) && allow_glob, MAX_AT_FILE_LEVEL);
+
+      if (__argc == -EMLINK)
+	api_fatal ("Too many levels of nesting for %s", line);
+      else if (__argc < 0)
+	api_fatal ("%s for parsing cmdline %s", strerror(-__argc), line);
 
       /* Convert argv[0] to posix rules if it's currently blatantly
 	 win32 style. */
